@@ -1,0 +1,19 @@
+[project]
+name = "fastapi-setup"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Deelolade", email = "oluwanisholahabeeb13@icloud.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]>=0.142.2",
+]
+
+[project.scripts]
+fastapi-setup = "fastapi_setup:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
