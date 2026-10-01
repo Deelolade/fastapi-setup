@@ -27,28 +27,9 @@
     <!-- DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
+        <!--this url is used to serve static files from the 'static' directory, whether it's a CSS file or an image-->
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: grid;
-            place-items: center;
-            border-radius: 0.5rem;
-        }
-
-        .calendar-day.today {
-            background: #2563eb;
-            color: white;
-            font-weight: 700;
-        }
-    </style>
 
     <script>
         // Apply saved theme before the page renders.
@@ -71,7 +52,7 @@
         <nav class="navbar mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 
             <div class="navbar-start gap-2">
-                <a href="/" class="flex items-center gap-2">
+                <a href="{{ url_for('home') }}" class="flex items-center gap-2">
                     <span class="grid size-10 place-items-center rounded-xl bg-primary text-primary-content">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              width="22" height="22" viewBox="0 0 24 24"
@@ -91,7 +72,7 @@
             <div class="navbar-center hidden md:flex">
                 <ul class="menu menu-horizontal gap-1 px-1">
                     <li>
-                        <a href="/" class="font-medium">Home</a>
+                        <a href="{{ url_for('home') }}" class="font-medium">Home</a>
                     </li>
                     <li>
                         <a href="#" class="font-medium">About</a>
@@ -145,7 +126,7 @@
                     </button>
                     <ul tabindex="0"
                         class="menu dropdown-content z-50 mt-3 w-48 rounded-box bg-base-100 p-2 shadow-lg">
-                        <li><a href="/">Home</a></li>
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
                         <li><a href="#">About</a></li>
                         <li><a href="/login">Login</a></li>
                     </ul>

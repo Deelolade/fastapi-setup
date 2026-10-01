@@ -32,9 +32,9 @@ posts: list[dict] = [
 
 # include_in_schema=False is used to exclude the endpoint from the OpenAPI schema
 # response_class=HTMLResponse, is used to return an HTML response without a template yet.
-@app.get("/", include_in_schema=False)
+@app.get("/", include_in_schema=False, name="home")
 # a function can have multiple decorators, returning same data
-@app.get("/posts", include_in_schema=False)
+@app.get("/posts", include_in_schema=False, name="posts")
 # a function that returns an HTML response
 async def home(request: Request):
     return templates.TemplateResponse(request, "index.html", {"posts": posts, "title": "Home"})
