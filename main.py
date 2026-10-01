@@ -1,5 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="templates")
+
 app = FastAPI()
 
 posts: list[dict] = [
@@ -25,11 +29,13 @@ posts: list[dict] = [
 
 
 # include_in_schema=False is used to exclude the endpoint from the OpenAPI schema
-@app.get("/", response_class=HTMLResponse, include_in_schema=False) # a function can have multiple decorators, returning same data
-@app.get("/posts", response_class=HTMLResponse, include_in_schema=False) # a function that returns an HTML response
-async def home():
-    return f"<h1>{posts[0]['title']}</h1>"
-
+# response_class=HTMLResponse, is used to return an HTML response without a template yet.
+@app.get("/", include_in_schema=False)
+# a function can have multiple decorators, returning same data
+@app.get("/posts", include_in_schema=False)
+# a function that returns an HTML response
+async def home(request: Request):
+    return templates.TemplateResponse(request, "index.html", {"posts": posts, "title": "Home"})
 
 @app.get("/api/posts")
 async def read_posts():
