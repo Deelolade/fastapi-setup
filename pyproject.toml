@@ -1,7 +1,7 @@
 [project]
 name = "fastapi-setup"
 version = "0.1.0"
-description = "Add your description here"
+description = "this is a fastapi setup to learn how to use fastapi, and be comfortable with it."
 readme = "README.md"
 authors = [
     { name = "Deelolade", email = "oluwanisholahabeeb13@icloud.com" }
