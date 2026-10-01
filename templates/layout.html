@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>
+        {% if title %}
+            {{ title }} | Deelolade Blog
+        {% else %}
+            Deelolade Blog
+        {% endif %}
+    </title>
+
+    <meta name="description" content="Articles, tutorials and thoughts on software development.">
+    <meta name="author" content="Deelolade">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS browser CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: grid;
+            place-items: center;
+            border-radius: 0.5rem;
+        }
+
+        .calendar-day.today {
+            background: #2563eb;
+            color: white;
+            font-weight: 700;
+        }
+    </style>
+
+    <script>
+        // Apply saved theme before the page renders.
+        (() => {
+            const savedTheme = localStorage.getItem("blog-theme");
+            const systemDark = window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches;
+
+            document.documentElement.dataset.theme =
+                savedTheme || (systemDark ? "dark" : "light");
+        })();
+    </script>
+</head>
+
+<body class="min-h-screen bg-base-200 text-base-content">
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 backdrop-blur">
+        <nav class="navbar mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+
+            <div class="navbar-start gap-2">
+                <a href="/" class="flex items-center gap-2">
+                    <span class="grid size-10 place-items-center rounded-xl bg-primary text-primary-content">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                        </svg>
+                    </span>
+                    <span class="text-lg font-bold tracking-tight">
+                        Deelolade<span class="text-primary">.</span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="navbar-center hidden md:flex">
+                <ul class="menu menu-horizontal gap-1 px-1">
+                    <li>
+                        <a href="/" class="font-medium">Home</a>
+                    </li>
+                    <li>
+                        <a href="#" class="font-medium">About</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="navbar-end gap-2">
+                <!-- Theme toggle -->
+                <button
+                    id="theme-toggle"
+                    type="button"
+                    class="btn btn-ghost btn-square"
+                    aria-label="Toggle dark mode"
+                    title="Toggle theme">
+
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg"
+                         width="21" height="21" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         class="hidden">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+                    </svg>
+
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg"
+                         width="21" height="21" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.463.402.807a6.5 6.5 0 0 0 8.268 8.268c.344-.215.829-.003.803.397Z"/>
+                    </svg>
+                </button>
+
+                <a href="/login" class="btn btn-ghost btn-sm hidden sm:inline-flex">
+                    Login
+                </a>
+                <a href="/register" class="btn btn-primary btn-sm">
+                    Register
+                </a>
+
+                <!-- Mobile navigation -->
+                <div class="dropdown dropdown-end md:hidden">
+                    <button tabindex="0" class="btn btn-ghost btn-square"
+                            aria-label="Open navigation">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <ul tabindex="0"
+                        class="menu dropdown-content z-50 mt-3 w-48 rounded-box bg-base-100 p-2 shadow-lg">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="/login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Page content -->
+    <main class="mx-auto min-h-[70vh] w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-base-300 bg-base-100">
+        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-base-content/60 sm:flex-row sm:px-6 lg:px-8">
+            <p>
+                &copy; <span id="current-year"></span> Deelolade.
+                All rights reserved.
+            </p>
+            <p>Built with Python, FastAPI &amp; DaisyUI.</p>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById("theme-toggle");
+        const sunIcon = document.getElementById("sun-icon");
+        const moonIcon = document.getElementById("moon-icon");
+
+        function updateThemeIcons() {
+            const isDark =
+                document.documentElement.dataset.theme === "dark";
+
+            sunIcon.classList.toggle("hidden", !isDark);
+            moonIcon.classList.toggle("hidden", isDark);
+        }
+
+        themeToggle.addEventListener("click", () => {
+            const currentTheme =
+                document.documentElement.dataset.theme;
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+            document.documentElement.dataset.theme = newTheme;
+            localStorage.setItem("blog-theme", newTheme);
+            updateThemeIcons();
+        });
+
+        updateThemeIcons();
+
+        document.getElementById("current-year").textContent =
+            new Date().getFullYear();
+    </script>
+</body>
+</html>
