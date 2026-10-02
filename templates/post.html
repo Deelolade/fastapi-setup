@@ -1,0 +1,239 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+
+    <!-- Main article -->
+    <article class="min-w-0 space-y-6 lg:col-span-8">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="Breadcrumb" class="text-sm text-base-content/50">
+            <ol class="flex flex-wrap items-center gap-2">
+                <li>
+                    <a href="/" class="hover:text-primary">Home</a>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li class="font-medium text-base-content" aria-current="page">
+                    {{ post.title }}
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Article header -->
+        <header class="space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+                {% if post.category %}
+                    <span class="badge badge-primary badge-outline">
+                        {{ post.category }}
+                    </span>
+                {% else %}
+                    <span class="badge badge-primary badge-outline">
+                        Article
+                    </span>
+                {% endif %}
+
+                {% if post.reading_time %}
+                    <span class="text-xs text-base-content/50">
+                        {{ post.reading_time }} min read
+                    </span>
+                {% endif %}
+            </div>
+
+            <h1 class="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                {{ post.title }}
+            </h1>
+
+            {% if post.description %}
+                <p class="text-lg leading-relaxed text-base-content/65">
+                    {{ post.description }}
+                </p>
+            {% endif %}
+
+            <!-- Author and date -->
+            <div class="flex flex-wrap items-center gap-3 border-y border-base-300 py-4">
+                <div class="avatar placeholder">
+                    <div class="w-10 rounded-full bg-primary text-primary-content">
+                        <span class="text-sm font-bold">D</span>
+                    </div>
+                </div>
+
+                <div class="flex-1">
+                    <p class="text-sm font-semibold">Deelolade</p>
+                    <p class="text-xs text-base-content/50">
+                        {{ post.date_posted }}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="navigator.clipboard.writeText(window.location.href).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy link', 2000) })"
+                    class="btn btn-ghost btn-sm border border-base-300">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="16" height="16" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="8" y="8" width="13" height="13" rx="2"/>
+                        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                    Copy link
+                </button>
+            </div>
+        </header>
+
+        <!-- Cover image (optional) -->
+        {% if post.image %}
+        <figure class="overflow-hidden rounded-xl border border-base-300">
+            <img
+                src="{{ post.image }}"
+                alt="{{ post.title }}"
+                class="max-h-[440px] w-full object-cover"
+            >
+        </figure>
+        {% endif %}
+
+        <!-- Article body -->
+        <div class="prose prose-lg max-w-none
+                    prose-headings:font-bold
+                    prose-headings:tracking-tight
+                    prose-a:text-primary
+                    prose-a:no-underline
+                    hover:prose-a:underline
+                    prose-img:rounded-xl
+                    prose-pre:rounded-xl">
+
+            {% if post.content %}
+                {{ post.content | safe }}
+            {% else %}
+                <p class="text-base-content/60">
+                    This article has no content yet.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Article footer -->
+        <div class="border-t border-base-300 pt-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <p class="text-sm font-semibold">Enjoyed this article?</p>
+                    <p class="text-xs text-base-content/60">
+                        Share it with someone who might find it useful.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="navigator.clipboard.writeText(window.location.href).then(() => { this.textContent = 'Link copied!' })"
+                    class="btn btn-primary btn-sm">
+                    Share article
+                </button>
+            </div>
+        </div>
+
+        <!-- Back to home -->
+        <div class="pt-2">
+            <a href="/" class="btn btn-ghost btn-sm">
+                <span aria-hidden="true">←</span>
+                Back to all posts
+            </a>
+        </div>
+    </article>
+
+    <!-- Sidebar -->
+    <aside class="space-y-5 lg:col-span-4">
+
+        <!-- Table of contents -->
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body gap-3 p-5">
+                <h2 class="font-bold">On this page</h2>
+                <nav aria-label="Table of contents">
+                    {% if post.toc %}
+                    <ul class="space-y-3 border-l-2 border-base-300 pl-4 text-sm">
+                        {% for item in post.toc %}
+                        <li>
+                            <a href="#{{ item.id }}"
+                               class="text-base-content/65 hover:text-primary">
+                                {{ item.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-sm text-base-content/50">
+                        No table of contents available.
+                    </p>
+                    {% endif %}
+                </nav>
+            </div>
+        </section>
+
+        <!-- Author -->
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body gap-3 p-5">
+                <h2 class="font-bold">About the author</h2>
+                <div class="flex items-center gap-3">
+                    <div class="avatar placeholder">
+                        <div class="w-12 rounded-full bg-primary text-primary-content">
+                            <span class="font-bold">D</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Deelolade</p>
+                        <p class="text-xs text-base-content/50">
+                            Full-Stack Developer
+                        </p>
+                    </div>
+                </div>
+                <p class="text-sm leading-relaxed text-base-content/65">
+                    Sharing thoughts, tutorials and experiences in
+                    software development.
+                </p>
+                <a href="/" class="link link-primary text-sm no-underline hover:underline">
+                    More articles →
+                </a>
+            </div>
+        </section>
+
+        <!-- Related posts -->
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body gap-3 p-5">
+                <h2 class="font-bold">Related posts</h2>
+
+                {% if related_posts %}
+                <ul class="space-y-3">
+                    {% for related in related_posts %}
+                    <li class="border-b border-base-200 pb-3 last:border-0 last:pb-0">
+                        <a href="/posts/{{ related.id }}"
+                           class="text-sm font-medium hover:text-primary">
+                            {{ related.title }}
+                        </a>
+                        <p class="mt-1 text-xs text-base-content/50">
+                            {{ related.date_posted }}
+                        </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-sm text-base-content/50">
+                    No related posts yet.
+                </p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Newsletter placeholder -->
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body gap-2 p-5">
+                <h2 class="font-bold">Stay updated</h2>
+                <p class="text-sm leading-relaxed text-base-content/65">
+                    Check back for more articles and tutorials.
+                </p>
+                <a href="/" class="btn btn-outline btn-sm mt-1">
+                    Explore posts
+                </a>
+            </div>
+        </section>
+
+    </aside>
+</div>
+{% endblock content %}

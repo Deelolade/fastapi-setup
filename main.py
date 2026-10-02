@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Request
+from typing_extensions import Pattern
+
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -10,6 +12,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 posts: list[dict] = [
     {
+        "id": 1,
         "title": "understanding fastapi",
         "content": "fastapi is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints.",
         "published": True,
@@ -17,11 +20,20 @@ posts: list[dict] = [
         "date_posted": "2023-01-01",
     },
     {
+        "id": 2,
         "title": "understanding fastify",
         "content": "fastify is a modern, fast (high-performance), web framework for building APIs with Node.js and TypeScript.",
         "published": True,
         "author": "John Doe",
         "date_posted": "2024-05-06",
+    },
+    {
+        "id": 3,
+        "title": "understanding nest.js",
+        "content": "nest.js is a modern, fast (high-performance), web framework for building APIs with Node.js and TypeScript.",
+        "published": True,
+        "author": "John Doe",
+        "date_posted": "2024-05-02",
     },
 ]
 
@@ -39,6 +51,24 @@ posts: list[dict] = [
 async def home(request: Request):
     return templates.TemplateResponse(request, "index.html", {"posts": posts, "title": "Home"})
 
+@app.get("/posts/{post_id}", include_in_schema=False, response_class=HTMLResponse)
+async def get_post(post_id: int, request: Request):
+    for post in posts:
+        if post.get("id") == post_id:
+            title = post["title"][:50] + "..."
+            return templates.TemplateResponse(request, "post.html", {"post": post, "title": title})
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
+    
+
+
 @app.get("/api/posts")
 async def read_posts():
     return posts
+
+@app.get("/api/post/{post_id}")
+async def read_post(post_id: int):
+    for post in posts:
+        if post.get("id") == post_id:
+            return post
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
+    
