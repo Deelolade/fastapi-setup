@@ -1,3 +1,5 @@
+import re
+
 from typing_extensions import Pattern
 
 from fastapi import FastAPI, Request, HTTPException, status
@@ -7,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from schemas import PostCreate, PostResponse
 
 templates = Jinja2Templates(directory="templates")
 
@@ -61,14 +64,26 @@ async def get_post(post_id: int, request: Request):
             title = post["title"][:50] + "..."
             return templates.TemplateResponse(request, "post.html", {"post": post, "title": title})
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
-    
 
 
-@app.get("/api/posts")
+@app.post("/api/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
+def create_post(post: PostCreate):
+    new_id = max(p["id"] for p in posts) + 1 if posts else 1
+    new_post = {
+        "id": new_id,
+        "title": post.title,
+        "author": post.author, 
+        "content": post.content,
+        "date_posted": "September 2026"
+    }
+    posts.append(new_post)
+    return new_post
+
+@app.get("/api/posts", response_model=list[PostResponse])
 async def read_posts():
     return posts
 
-@app.get("/api/post/{post_id}")
+@app.get("/api/posts/{post_id}", response_model=PostResponse)
 async def read_post(post_id: int):
     for post in posts:
         if post.get("id") == post_id:
@@ -80,14 +95,14 @@ async def read_post(post_id: int):
 def general_http_exception_handler(request: Request, exception: StarletteHTTPException):
     message = (
         exception.detail
-        if exception.detail 
+        if exception.detail
         else "An error occurred. Please try again later."
     )
     if request.url.path.startswith("/api"):
         return JSONResponse(
             status_code=exception.status_code,
             content={"detail": message})
-        
+
     return templates.TemplateResponse(
         request,
         "error.html",
@@ -116,4 +131,3 @@ def validation_exception_handler(request: Request, exception: RequestValidationE
         },
         status_code=status.HTTP_422_UNPROCESSABLE_CONTENT
     )
-    
