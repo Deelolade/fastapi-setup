@@ -4,17 +4,17 @@ from pydantic import BaseModel, Field, ConfigDict, EmailStr
 class UserBase(BaseModel):
     username: str = Field(min_length=1, max_length=50)
     email: EmailStr = Field(max_length=120)
-    
+
 class UserCreate(UserBase):
     pass
-    
+
 class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True) # so pydantic can convert from ORM model
 
     id: int
-    image_path: str | None
-    image_file : str
-    
+    image_path: str
+    image_file : str | None
+
 
 
 class PostBase(BaseModel):

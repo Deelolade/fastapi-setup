@@ -1,4 +1,3 @@
-
 {% extends "layout.html" %}
 
 {% block content %}
@@ -12,201 +11,317 @@
             <span class="badge badge-primary badge-outline">
                 Welcome to my blog
             </span>
+
             <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Ideas, insights &amp; <span class="text-primary">experiences.</span>
+                Ideas, insights &amp;
+                <span class="text-primary">experiences.</span>
             </h1>
+
             <p class="max-w-2xl text-base leading-relaxed text-base-content/65">
                 A space for sharing tutorials, development experiences,
                 ideas and everything worth writing about.
             </p>
         </div>
 
+
         <!-- Featured post -->
         {% if posts %}
         <article class="card overflow-hidden border border-base-300 bg-base-100 shadow-sm">
             <div class="card-body gap-3 p-5 sm:p-7">
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="badge badge-primary badge-sm">Featured</span>
-                    <span class="text-xs text-base-content/50">
-                        {{ posts[0].date_posted }}
+
+                <!-- Author details -->
+                <div class="flex items-center gap-3">
+
+                    <img
+                        class="size-12 flex-shrink-0 rounded-full object-cover"
+                        src="{{ posts[0].author.image_path }}"
+                        alt="{{ posts[0].author.username }}'s profile picture"
+                        width="48"
+                        height="48"
+                        loading="lazy"
+                    >
+
+                    <div>
+                        <a
+                            class="font-semibold hover:text-primary"
+                            href="{{ url_for('user_posts', user_id=posts[0].author.id) }}"
+                        >
+                            {{ posts[0].author.username }}
+                        </a>
+
+                        <div class="text-xs text-base-content/50">
+                            {{ posts[0].date_posted.strftime("%B %d, %Y") }}
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Featured badge -->
+                <div class="flex flex-wrap items-center gap-2 pt-2">
+                    <span class="badge badge-primary badge-sm">
+                        Featured
                     </span>
                 </div>
 
+
+                <!-- Post title -->
                 <h2 class="card-title text-2xl font-bold sm:text-3xl">
                     {{ posts[0].title }}
                 </h2>
 
+
+                <!-- Post content -->
                 <p class="leading-relaxed text-base-content/70">
                     {{ posts[0].content[:250] }}
                     {% if posts[0].content|length > 250 %}...{% endif %}
                 </p>
 
+
+                <!-- Read button -->
                 <div class="card-actions mt-2">
-                    <a href={{url_for("get_post", post_id=posts[0].id)}} class="btn btn-primary btn-sm">
+                    <a
+                        href="{{ url_for('get_post', post_id=posts[0].id) }}"
+                        class="btn btn-primary btn-sm"
+                    >
                         Read article
                         <span aria-hidden="true">→</span>
                     </a>
                 </div>
+
             </div>
         </article>
         {% endif %}
 
+
         <!-- Latest posts -->
         <section class="space-y-4">
+
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-bold tracking-tight">
                     Latest posts
                 </h2>
-                <a href="#" class="link link-primary text-sm no-underline hover:underline">
+
+                <a
+                    href="#"
+                    class="link link-primary text-sm no-underline hover:underline"
+                >
                     View all →
                 </a>
             </div>
 
+
             {% if posts %}
+
                 <div class="space-y-3">
+
                     {% for post in posts %}
+
                     <article class="card border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/50">
-                        <div class="card-body gap-2 p-5">
+
+                        <div class="card-body gap-3 p-5">
+
+                            <!-- Author details -->
+                            <div class="flex items-center gap-3">
+
+                                <img
+                                    class="size-10 flex-shrink-0 rounded-full object-cover"
+                                    src="{{ post.author.image_path }}"
+                                    alt="{{ post.author.username }}'s profile picture"
+                                    width="40"
+                                    height="40"
+                                    loading="lazy"
+                                >
+
+                                <div class="min-w-0">
+
+                                    <a
+                                        class="text-sm font-semibold hover:text-primary"
+                                        href="{{ url_for('user_posts', user_id=post.author.id) }}"
+                                    >
+                                        {{ post.author.username }}
+                                    </a>
+
+                                    <p class="text-xs text-base-content/50">
+                                        {{ post.date_posted.strftime("%B %d, %Y") }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Post type -->
                             <div class="flex flex-wrap items-center gap-2 text-xs text-base-content/50">
-                                <span>{{ post.date_posted }}</span>
-                                <span>·</span>
                                 <span>Article</span>
                             </div>
 
+
+                            <!-- Post title -->
                             <h3 class="text-lg font-semibold leading-snug">
                                 {{ post.title }}
                             </h3>
 
+
+                            <!-- Post content -->
                             <p class="text-sm leading-relaxed text-base-content/65">
                                 {{ post.content[:180] }}
                                 {% if post.content|length > 180 %}...{% endif %}
                             </p>
 
+
+                            <!-- Read more -->
                             <div class="pt-1">
-                                <a href={{url_for("get_post", post_id=post.id)}} class="link link-primary text-sm font-medium no-underline hover:underline">
+                                <a
+                                    href="{{ url_for('user_posts', user_id=post.user_id) }}"
+                                    class="link link-primary text-sm font-medium no-underline hover:underline"
+                                >
                                     Read more →
                                 </a>
                             </div>
+
                         </div>
                     </article>
+
                     {% endfor %}
+
                 </div>
+
             {% else %}
+
                 <div class="rounded-xl border border-dashed border-base-300 bg-base-100 p-10 text-center">
-                    <div class="mb-3 text-3xl">📝</div>
-                    <h3 class="font-semibold">No posts yet</h3>
+
+                    <div class="mb-3 text-3xl">
+                        📝
+                    </div>
+
+                    <h3 class="font-semibold">
+                        No posts yet
+                    </h3>
+
                     <p class="mt-1 text-sm text-base-content/60">
                         New articles will appear here soon.
                     </p>
+
                 </div>
+
             {% endif %}
+
         </section>
+
     </section>
+
 
     <!-- Sidebar -->
     <aside class="space-y-5 lg:col-span-4">
 
         <!-- Latest posts sidebar -->
         <section class="card border border-base-300 bg-base-100 shadow-sm">
+
             <div class="card-body gap-3 p-5">
+
                 <h2 class="flex items-center gap-2 font-bold">
                     <span class="text-primary">▎</span>
                     Latest posts
                 </h2>
 
+
                 {% if posts %}
+
                     <ul class="space-y-3">
+
                         {% for post in posts[:5] %}
+
                         <li class="border-b border-base-200 pb-3 last:border-0 last:pb-0">
-                            <a href={{url_for("get_post", post_id=post.id)}} class="text-sm font-medium leading-relaxed hover:text-primary">
+
+                            <a
+                                href="{{ url_for('get_post', post_id=post.id) }}"
+                                class="text-sm font-medium leading-relaxed hover:text-primary"
+                            >
                                 {{ post.title }}
                             </a>
+
                             <p class="mt-1 text-xs text-base-content/50">
-                                {{ post.date_posted }}
+                                {{ post.date_posted.strftime("%B %d, %Y") }}
                             </p>
+
                         </li>
+
                         {% endfor %}
+
                     </ul>
+
                 {% else %}
+
                     <p class="text-sm text-base-content/60">
                         No recent posts.
                     </p>
+
                 {% endif %}
+
             </div>
+
         </section>
+
 
         <!-- Announcements -->
         <section class="card border border-base-300 bg-base-100 shadow-sm">
+
             <div class="card-body gap-3 p-5">
+
                 <h2 class="flex items-center gap-2 font-bold">
                     <span class="text-primary">▎</span>
                     Announcements
                 </h2>
 
                 <div class="rounded-lg bg-base-200 p-3">
+
                     <span class="badge badge-success badge-sm mb-2">
                         Welcome
                     </span>
+
                     <p class="text-sm font-medium">
                         Welcome to Deelolade Blog!
                     </p>
+
                     <p class="mt-1 text-xs leading-relaxed text-base-content/60">
                         A new place for articles, tutorials and ideas.
                         Stay tuned for updates.
                     </p>
+
                 </div>
+
             </div>
+
         </section>
 
-        <!-- Calendar -->
-        <!--<section class="card border border-base-300 bg-base-100 shadow-sm">
-            <div class="card-body gap-3 p-5">
-                <div class="flex items-center justify-between">
-                    <h2 class="font-bold">Calendar</h2>
-                    <span class="text-xs text-base-content/60">
-                        October 2026
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-7 gap-1 text-center text-xs">
-                    {% for day in ["S", "M", "T", "W", "T", "F", "S"] %}
-                    <span class="py-1 font-semibold text-base-content/50">
-                        {{ day }}
-                    </span>
-                    {% endfor %}
-
-                    {% for day in range(1, 36) %}
-                        {% if day <= 31 %}
-                        <span class="calendar-day text-sm
-                            {% if day == 1 %}today{% else %}hover:bg-base-200{% endif %}">
-                            {{ day }}
-                        </span>
-                        {% else %}
-                        <span></span>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-                <p class="text-xs text-base-content/50">
-                    <span class="inline-block size-2 rounded-full bg-primary"></span>
-                    Current date
-                </p>
-            </div>
-        </section>-->
 
         <!-- About -->
         <section class="card border border-base-300 bg-base-100 shadow-sm">
+
             <div class="card-body gap-2 p-5">
-                <h2 class="font-bold">About this blog</h2>
+
+                <h2 class="font-bold">
+                    About this blog
+                </h2>
+
                 <p class="text-sm leading-relaxed text-base-content/65">
                     A personal space to document ideas, share knowledge
                     and explore technology.
                 </p>
-                <a href="#" class="link link-primary text-sm no-underline hover:underline">
+
+                <a
+                    href="#"
+                    class="link link-primary text-sm no-underline hover:underline"
+                >
                     Learn more →
                 </a>
+
             </div>
+
         </section>
+
     </aside>
+
 </div>
 {% endblock content %}

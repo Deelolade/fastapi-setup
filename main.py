@@ -40,7 +40,7 @@ def home(request: Request, db: Annotated[Session, Depends(get_db)]):
     return templates.TemplateResponse(request, "index.html", {"posts": posts, "title": "Home"})
 
 @app.get("/posts/{post_id}", include_in_schema=False, response_class=HTMLResponse)
-def get_post(post_id: int, request: Request, db: Annotated[Session, Depends(get_db)]):
+def post_page(post_id: int, request: Request, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.Post).where(models.Post.id == post_id)
     )
@@ -54,7 +54,7 @@ def get_post(post_id: int, request: Request, db: Annotated[Session, Depends(get_
         )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
 
-@app.get("users/{user_id}/posts", response_model=list[PostResponse])
+@app.get("/users/{user_id}/posts",include_in_schema=False,  response_model=list[PostResponse], name="user_posts")
 def user_posts_page(user_id: int, request: Request, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(models.User).where(models.User.id == user_id)
@@ -69,11 +69,11 @@ def user_posts_page(user_id: int, request: Request, db: Annotated[Session, Depen
     posts = results.scalars().all()
     return templates.TemplateResponse(
         request,
-        "user_post.html",
+        "user_posts.html",
         {"posts": posts, "user": user, "title": f"{user.username} Posts"}
     )
-    
-    
+
+
 # create user
 @app.post(
     "/api/users",
@@ -87,7 +87,7 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="username already exists"
         )
     result = db.execute(
@@ -96,7 +96,7 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="username already exists"
             )
 
@@ -104,7 +104,7 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
         username=user.username,
         email=user.email,
     )
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -119,7 +119,18 @@ def get_user(user_id: int, db: Annotated[Session, Depends(get_db)]):
     if user:
         return user
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
-    
+
+@app.get(
+    "/api/users",
+    response_model=list[UserResponse],
+)
+def get_users(db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+        select(models.User)
+    )
+    users = result.scalars().all()
+    return users
+
 @app.get("/api/posts/{user_id}/posts", response_model=list[PostResponse])
 def get_user_posts(user_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
@@ -128,13 +139,18 @@ def get_user_posts(user_id: int, db: Annotated[Session, Depends(get_db)]):
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
-        
+
     result = db.execute(
         select(models.Post).where(models.Post.user_id == user_id)
     )
     posts = result.scalars().all()
     return posts
 
+@app.post(
+    "/api/posts",
+    response_model=PostResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_post(post: PostCreate, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(select(models.User).where(models.User.id == post.user_id))
     user = result.scalars().first()
