@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 
@@ -15,6 +16,10 @@ class UserResponse(UserBase):
     image_path: str
     image_file : str | None
 
+class UserUpdate(BaseModel):
+    username: str | None = Field(default=None, min_length=1, max_length=50)
+    email: EmailStr | None = Field(default=None, max_length=120)
+    image_file: str | None = Field(default=None, min_length=1, max_length=50)
 
 
 class PostBase(BaseModel):

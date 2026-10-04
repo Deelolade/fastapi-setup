@@ -21,7 +21,8 @@ class User(Base):
         default=None,
     )
 
-    posts: Mapped[list[Post]] = relationship(back_populates="author")
+    posts: Mapped[list[Post]] = relationship(back_populates="author", cascade="all, delete-orphan") #  cascade all => delete all posts when user is deleted
+    # delete orphan => delete posts that are not associated with any user, serves as a cleanup
 
     @property
     def image_path(self) -> str:
