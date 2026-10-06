@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from schemas import UserCreate, UserResponse, UserUpdate
+from schemas import PostResponse, UserCreate, UserResponse, UserUpdate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select
@@ -15,8 +15,8 @@ router = APIRouter()
 # create user
 @router.post("",response_model=UserResponse,status_code=status.HTTP_201_CREATED)
 async def create_user(
-    user: UserCreate, 
-    db: Annotated[AsyncSession, 
+    user: UserCreate,
+    db: Annotated[AsyncSession,
     Depends(get_db)]
 ):
     result = await db.execute(
@@ -50,8 +50,8 @@ async def create_user(
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
-    user_id: int, 
-    db: Annotated[AsyncSession, 
+    user_id: int,
+    db: Annotated[AsyncSession,
     Depends(get_db)]
 ):
     result = await db.execute(
@@ -72,6 +72,24 @@ async def get_users(
     )
     users = result.scalars().all()
     return users
+
+@router.get("/{user_id}/posts", response_model=list[PostResponse])
+async def get_user_posts(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+    result = await db.execute(
+        select(models.User).where(models.User.id == user_id)
+    )
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
+
+    result = await db.execute(
+        select(models.Post)
+        .options(selectinload(models.Post.author))
+        .where(models.Post.user_id == user_id)
+        .order_by(models.Post.id.desc())
+    )
+    posts = result.scalars().all()
+    return posts
 
 @router.patch("/{user_id}", response_model=UserResponse)
 async def update_user(
@@ -122,8 +140,8 @@ async def update_user(
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    user_id: int, 
-    db: Annotated[AsyncSession, 
+    user_id: int,
+    db: Annotated[AsyncSession,
     Depends(get_db)]
 ):
     result = await db.execute(select(models.User).where(models.User.id == user_id))

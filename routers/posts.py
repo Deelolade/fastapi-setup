@@ -38,7 +38,7 @@ async def create_post(post: PostCreate, db: Annotated[AsyncSession, Depends(get_
 @router.get("", response_model=list[PostResponse])
 async def get_posts(db: Annotated[AsyncSession, Depends(get_db)]):
     result = await db.execute(
-        select(models.Post).options(selectinload(models.Post.author))
+        select(models.Post).options(selectinload(models.Post.author)).order_by(models.Post.id.desc())
     )
     posts = result.scalars().all()
     return posts
@@ -77,22 +77,6 @@ async def update_post_full(post_id: int, post_data: PostCreate, db: Annotated[As
     await db.commit()
     await db.refresh(post, attribute_names=["author"])
     return post
-
-@router.get("/{user_id}/posts", response_model=list[PostResponse])
-async def get_user_posts(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(
-        select(models.User).where(models.User.id == user_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
-
-    result = await db.execute(
-        select(models.Post).options(selectinload(models.Post.author)).where(models.Post.user_id == user_id)
-    )
-    posts = result.scalars().all()
-    return posts
-
 
 @router.patch("/{post_id}", response_model=PostResponse)
 async def update_post_partial(post_id: int, post_data: PostUpdate, db: Annotated[AsyncSession, Depends(get_db)]):
