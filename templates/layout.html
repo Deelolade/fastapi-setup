@@ -21,164 +21,122 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS browser CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <!-- DaisyUI -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
-        <!--this url is used to serve static files from the 'static' directory, whether it's a CSS file or an image-->
-
-
-    <script>
-        // Apply saved theme before the page renders.
-        (() => {
-            const savedTheme = localStorage.getItem("blog-theme");
-            const systemDark = window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches;
-
-            document.documentElement.dataset.theme =
-                savedTheme || (systemDark ? "dark" : "light");
-        })();
-    </script>
+        <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for("static", path='css/main.css') }}">
+    <!-- Set a theme color that matches your website's primary color -->
+    <meta name="theme-color" content="#527c9f">
+    <!--this url is used to serve static files from the 'static' directory, whether it's a CSS file or an image-->
 </head>
 
-<body class="min-h-screen bg-base-200 text-base-content">
-
-    <!-- Navbar -->
-    <header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 backdrop-blur">
-        <nav class="navbar mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-
-            <div class="navbar-start gap-2">
-                <a href="{{ url_for('home') }}" class="flex items-center gap-2">
-                    <span class="grid size-10 place-items-center rounded-xl bg-primary text-primary-content">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="22" height="22" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round"
-                             stroke-linejoin="round">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
-                        </svg>
-                    </span>
-                    <span class="text-lg font-bold tracking-tight">
-                        Deelolade<span class="text-primary">.</span>
-                    </span>
-                </a>
-            </div>
-
-            <div class="navbar-center hidden md:flex">
-                <ul class="menu menu-horizontal gap-1 px-1">
-                    <li>
-                        <a href="{{ url_for('home') }}" class="font-medium">Home</a>
-                    </li>
-                    <li>
-                        <a href="#" class="font-medium">About</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="navbar-end gap-2">
-                <!-- Theme toggle -->
-                <button
-                    id="theme-toggle"
-                    type="button"
-                    class="btn btn-ghost btn-square"
-                    aria-label="Toggle dark mode"
-                    title="Toggle theme">
-
-                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg"
-                         width="21" height="21" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round"
-                         class="hidden">
-                        <circle cx="12" cy="12" r="4"/>
-                        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
-                    </svg>
-
-                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg"
-                         width="21" height="21" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.463.402.807a6.5 6.5 0 0 0 8.268 8.268c.344-.215.829-.003.803.397Z"/>
-                    </svg>
-                </button>
-
-                <a href="/login" class="btn btn-ghost btn-sm hidden sm:inline-flex">
-                    Login
-                </a>
-                <a href="/register" class="btn btn-primary btn-sm">
-                    Register
-                </a>
-
-                <!-- Mobile navigation -->
-                <div class="dropdown dropdown-end md:hidden">
-                    <button tabindex="0" class="btn btn-ghost btn-square"
-                            aria-label="Open navigation">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="22" height="22" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round">
-                            <path d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
+<body class="d-flex flex-column min-vh-100">
+        <header class="site-header">
+            <nav class="navbar navbar-expand-md bg-steel fixed-top"
+                 data-bs-theme="dark">
+                <div class="container">
+                    <a class="navbar-brand me-4" href="{{ url_for("home") }}">FastAPI Blog</a>
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarToggle"
+                            aria-controls="navbarToggle"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
                     </button>
-                    <ul tabindex="0"
-                        class="menu dropdown-content z-50 mt-3 w-48 rounded-box bg-base-100 p-2 shadow-lg">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="/login">Login</a></li>
-                    </ul>
+                    <div class="collapse navbar-collapse" id="navbarToggle">
+                        <div class="navbar-nav me-auto">
+                            <a class="nav-link active"
+                               aria-current="page"
+                               href="{{ url_for("home") }}">Home</a>
+                        </div>
+                        <!-- Navbar Right Side -->
+                        <div class="navbar-nav">
+                            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="#">Login</a>
+                            <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="#">Register</a>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   id="bd-theme"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <span id="bd-theme-text">🌗 Auto</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+                                    <li>
+                                        <button class="dropdown-item" type="button" data-bs-theme-value="light">🌝 Light</button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" type="button" data-bs-theme-value="dark">🌚 Dark</button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" type="button" data-bs-theme-value="auto">🌗 Auto</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </nav>
+        </header>
+        <main role="main" class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+                <aside class="col-md-4">
+                    <div class="content-section py-3 px-4 mb-4">
+                        <h3>Our Sidebar</h3>
+                        <p class="text-body-secondary">You can put any information here you'd like.</p>
+                        <ul class="list-group">
+                            <li class="list-group-item">Latest Posts</li>
+                            <li class="list-group-item">Announcements</li>
+                            <li class="list-group-item">Calendars</li>
+                            <li class="list-group-item">etc</li>
+                        </ul>
+                    </div>
+                </aside>
             </div>
-        </nav>
-    </header>
-
-    <!-- Page content -->
-    <main class="mx-auto min-h-[70vh] w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-base-300 bg-base-100">
-        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-base-content/60 sm:flex-row sm:px-6 lg:px-8">
-            <p>
-                &copy; <span id="current-year"></span> Deelolade.
-                All rights reserved.
-            </p>
-            <p>Built with Python, FastAPI &amp; DaisyUI.</p>
-        </div>
-    </footer>
-
-    <script>
-        const themeToggle = document.getElementById("theme-toggle");
-        const sunIcon = document.getElementById("sun-icon");
-        const moonIcon = document.getElementById("moon-icon");
-
-        function updateThemeIcons() {
-            const isDark =
-                document.documentElement.dataset.theme === "dark";
-
-            sunIcon.classList.toggle("hidden", !isDark);
-            moonIcon.classList.toggle("hidden", isDark);
+        </main>
+        <footer class="mt-auto py-3 bg-body-tertiary border-top">
+            <div class="container text-center">
+                <p class="text-body-secondary mb-0">
+                    © <span id="year"></span> Corey Schafer
+                </p>
+            </div>
+        </footer>
+        <!-- Set the current year in the footer -->
+        <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+        <!-- Bootstrap Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+                crossorigin="anonymous"></script>
+        <!-- Dark Mode Toggle -->
+        <script>
+      const setTheme = (theme) => {
+        if (theme === 'auto') {
+          document.documentElement.setAttribute('data-bs-theme',
+            window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } else {
+          document.documentElement.setAttribute('data-bs-theme', theme);
         }
+        localStorage.setItem('theme', theme);
 
-        themeToggle.addEventListener("click", () => {
-            const currentTheme =
-                document.documentElement.dataset.theme;
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
+        // Update button text
+        const themeText = { light: '🌝 Light', dark: '🌚 Dark', auto: '🌗 Auto' };
+        document.getElementById('bd-theme-text').textContent = themeText[theme];
+      };
 
-            document.documentElement.dataset.theme = newTheme;
-            localStorage.setItem("blog-theme", newTheme);
-            updateThemeIcons();
-        });
+      // Set theme on click
+      document.querySelectorAll('[data-bs-theme-value]').forEach(button => {
+        button.addEventListener('click', () => setTheme(button.getAttribute('data-bs-theme-value')));
+      });
 
-        updateThemeIcons();
-
-        document.getElementById("current-year").textContent =
-            new Date().getFullYear();
-    </script>
-</body>
+      // Initialize
+      setTheme(localStorage.getItem('theme') || 'auto');
+        </script>
+    </body>
 </html>
