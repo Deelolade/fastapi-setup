@@ -183,9 +183,9 @@ async def update_user(
             detail="User not found",
         )
 
-    if user_update.username is not None and user_update.username != user.username:
+    if user_update.username is not None and user_update.username.lower() != user.username.lower():
         result = await db.execute(
-            select(models.User).where(models.User.username == user_update.username),
+            select(models.User).where(func.lower(models.User.username) == user_update.username.lower()),
         )
         existing_user = result.scalars().first()
         if existing_user:
@@ -194,9 +194,9 @@ async def update_user(
                 detail="Username already exists",
             )
 
-    if user_update.email is not None and user_update.email != user.email:
-        result = db.execute(
-            select(models.User).where(models.User.email == user_update.email),
+    if user_update.email is not None and user_update.email.lower() != user.email.lower():
+        result = await db.execute(
+            select(models.User).where(func.lower(models.User.email) == user_update.email.lower()),
         )
         existing_email = result.scalars().first()
         if existing_email:
@@ -208,7 +208,7 @@ async def update_user(
     if user_update.username is not None:
         user.username = user_update.username
     if user_update.email is not None:
-        user.email = user_update.email
+        user.email = user_update.email.lower()
     if user_update.image_file is not None:
         user.image_file = user_update.image_file
 
