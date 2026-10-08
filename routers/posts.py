@@ -22,7 +22,7 @@ async def create_post(post: PostCreate, current_user: CurrentUser, db: Annotated
     new_post = models.Post(
         title=post.title,
         content=post.content,
-        user_id=current_user.user_id,
+        user_id=current_user.id,
     )
     db.add(new_post)
     await db.commit()
@@ -60,9 +60,9 @@ async def update_post_full(post_id: int, post_data: PostCreate, current_user: Cu
     post.title = post_data.title
     post.content = post_data.content
 
-    if post.user_id != current_user.user_id:
+    if post.user_id != current_user.id:
         raise HTTPException(
-            status_code= status.HTTP_403_FORBIDDEN
+            status_code= status.HTTP_403_FORBIDDEN,
             detail="Not authorized to update this post"
         )
     await db.commit()
@@ -78,9 +78,9 @@ async def update_post_partial(post_id: int, post_data: PostUpdate,current_user: 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
 
-    if post.user_id != current_user.user_id:
+    if post.user_id != current_user.id:
         raise HTTPException(
-            status_code= status.HTTP_403_FORBIDDEN
+            status_code= status.HTTP_403_FORBIDDEN,
             detail="Not authorized to update this post"
         )
 
@@ -101,9 +101,9 @@ async def delete_post(post_id: int,current_user:CurrentUser, db: Annotated[Async
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
 
-    if post.user_id != current_user.user_id:
+    if post.user_id != current_user.id:
         raise HTTPException(
-            status_code= status.HTTP_403_FORBIDDEN
+            status_code= status.HTTP_403_FORBIDDEN,
             detail="Not authorized to delete this post"
         )
     await db.delete(post)
