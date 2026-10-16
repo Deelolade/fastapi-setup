@@ -49,6 +49,41 @@
     </div>
     <hr />
     <!-- Profile Picture Section -->
+    <div class="mb-4">
+        <h5>Profile Picture</h5>
+        <!-- Preview container -->
+        <div class="mb-3">
+            <img
+                id="imagePreview"
+                class="rounded-circle d-none object-fit-cover"
+                alt="Image preview"
+                width="150"
+                height="150"
+            />
+        </div>
+        <!-- File input and upload button -->
+        <div class="d-flex gap-2 align-items-start">
+            <input
+                type="file"
+                class="form-control file-input-sm"
+                id="pictureInput"
+                accept="image/*"
+            />
+            <button
+                type="button"
+                class="btn btn-primary"
+                id="uploadPictureBtn"
+                disabled
+            >
+                Upload
+            </button>
+        </div>
+        <small class="text-body-secondary"
+            >Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF,
+            WebP.</small
+        >
+    </div>
+    <hr />
     <!-- Change Password Section -->
     <div class="mb-4">
         <h5>Change Password</h5>
@@ -97,31 +132,6 @@
                 class="btn btn-primary"
                 id="changePasswordBtn"
             >
-                Change Password
-            </button>
-        </form>
-    </div>
-    <hr />
-    <!-- Password Reset Section (Placeholder) -->
-    <div class="mb-4">
-        <h5>Change Password</h5>
-        <p class="text-body-secondary">
-            Password reset coming in a future tutorial.
-        </p>
-        <form>
-            <div class="mb-3">
-                <label class="form-label">Current Password</label>
-                <input type="password" class="form-control" disabled />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <input type="password" class="form-control" disabled />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Confirm New Password</label>
-                <input type="password" class="form-control" disabled />
-            </div>
-            <button type="submit" class="btn btn-primary" disabled>
                 Change Password
             </button>
         </form>
@@ -253,6 +263,7 @@
             uploadBtn.disabled = true;
         }
     });
+
     // Upload Profile Picture Handler
     uploadBtn.addEventListener("click", async () => {
         const token = getToken();
@@ -445,8 +456,8 @@
 
     // Load user data on page load
     loadUserData();
-</script>
-<script>
+
+    // Change Password Handler
     const changePasswordForm = document.getElementById("changePasswordForm");
     const changePasswordBtn = document.getElementById("changePasswordBtn");
 
