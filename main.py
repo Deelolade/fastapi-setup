@@ -16,9 +16,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from schemas import PostResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select
+from sqlalchemy import select, func
 from database import get_db, Base, engine
 from routers import posts, users
+from config import settings
 
 import models
 
@@ -51,16 +52,32 @@ app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 # include_in_schema=False is used to exclude the endpoint from the OpenAPI schema
 # response_class=HTMLResponse, is used to return an HTML response without a template yet.
 @app.get("/", include_in_schema=False, name="home")
-# a function can have multiple decorators, returning same data
 @app.get("/posts", include_in_schema=False, name="posts")
-# a function that returns an HTML response
 async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
+    
+    count_result = await db.execute(select(func.count()).select_from(models.Post))
+    total = count_result.scalar() or 0
+
     result = await db.execute(
-        select(models.Post).options(selectinload(models.Post.author)).order_by(models.Post.id.desc())
+        select(models.Post)
+        .options(selectinload(models.Post.author))
+        .order_by(models.Post.date_posted.desc())
+        .limit(settings.posts_per_page),
     )
     posts = result.scalars().all()
 
-    return templates.TemplateResponse(request, "index.html", {"posts": posts, "title": "Home"})
+    has_more = len(posts) < total
+
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "posts": posts,
+            "title": "Home",
+            "limit": settings.posts_per_page,
+            "has_more": has_more,
+        },
+    )
 
 @app.get("/posts/{post_id}", include_in_schema=False, response_class=HTMLResponse)
 async def post_page(post_id: int, request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
