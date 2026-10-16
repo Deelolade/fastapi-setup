@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Deelolade", email = "oluwanisholahabeeb13@icloud.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = [
     "aiosmtplib>=5.1.3",
     "aiosqlite>=0.22.1",

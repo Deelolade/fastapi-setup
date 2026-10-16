@@ -1,5 +1,6 @@
 import asyncio
-from datetime import datetime, timedelta
+import random
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -17,7 +18,7 @@ USERS = [
         "username": "CoreyMSchafer",
         "email": "CoreyMSchafer@gmail.com",
         "password": "TestPassword1!",
-        "image": "corey.png",
+        "image": True,
     },
     {
         "username": "DefaultDude",
@@ -29,25 +30,25 @@ USERS = [
         "username": "WillowTheCat",
         "email": "TestEmail3@test.com",
         "password": "TestPassword3!",
-        "image": "willow.png",
+        "image": True,
     },
     {
         "username": "FarmDogs",
         "email": "TestEmail4@test.com",
         "password": "TestPassword4!",
-        "image": "farmdogs.png",
+        "image": True,
     },
     {
         "username": "PoppyTheCoder",
         "email": "TestEmail5@test.com",
         "password": "TestPassword5!",
-        "image": "poppy.png",
+        "image": True,
     },
     {
         "username": "GoodBoyBronx",
         "email": "TestEmail6@test.com",
         "password": "TestPassword6!",
-        "image": "bronx.png",
+        "image": True,
     },
 ]
 
@@ -243,6 +244,7 @@ async def clear_existing_data() -> None:
 
     # Clear database tables (order respects foreign keys)
     async with AsyncSessionLocal() as db:
+        await db.execute(delete(models.PasswordResetToken))
         await db.execute(delete(models.Post))
         await db.execute(delete(models.User))
         await db.commit()
@@ -250,7 +252,7 @@ async def clear_existing_data() -> None:
 
 
 async def update_post_dates() -> None:
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
 
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(models.Post).order_by(models.Post.id))
@@ -282,18 +284,41 @@ async def update_post_dates() -> None:
 
 
 async def populate() -> None:
+    # Discover supported image files and shuffle them once.
+    # Resolve the directory relative to this script's working directory.
+    image_files = [
+        file
+        for file in POPULATE_IMAGES_DIR.iterdir()
+        if file.is_file()
+        and file.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+    ] if POPULATE_IMAGES_DIR.exists() else []
+
+    image_users_count = sum(bool(user_data.get("image")) for user_data in USERS)
+
+    # Validate before clearing any existing data.
+    if len(image_files) < image_users_count:
+        raise RuntimeError(
+            f"Found {len(image_files)} supported images in "
+            f"{POPULATE_IMAGES_DIR.resolve()}, but {image_users_count} "
+            "users need profile pictures. Add more images before running "
+            "the population script."
+        )
+
+    random.shuffle(image_files)
+    print(f"Found {len(image_files)} profile images; assigning {image_users_count} unique images.")
+
     transport = httpx.ASGITransport(app=app)
 
     async with httpx.AsyncClient(
         transport=transport,
         base_url="http://localhost",
     ) as client:
-        # Clear existing data (local images first, then database)
+        # Clear existing data only after validating that enough images exist.
         await clear_existing_data()
 
         users: list[dict] = []
 
-        print(f"\nCreating {len(USERS)} users...")
+        print(f"\\nCreating {len(USERS)} users...")
         for user_data in USERS:
             response = await client.post(
                 "/api/users",
@@ -317,28 +342,36 @@ async def populate() -> None:
             response.raise_for_status()
             token = response.json()["access_token"]
 
-            if image_name := user_data.get("image"):
-                image_path = POPULATE_IMAGES_DIR / image_name
-                if image_path.exists():
-                    response = await client.patch(
-                        f"/api/users/{user['id']}/picture",
-                        files={
-                            "file": (
-                                image_name,
-                                image_path.read_bytes(),
-                                "image/png",
-                            ),
-                        },
-                        headers={"Authorization": f"Bearer {token}"},
-                    )
-                    response.raise_for_status()
-                    print(f"    Uploaded: {image_name}")
+            if user_data.get("image"):
+                image_path = image_files.pop()
+
+                content_types = {
+                    ".png": "image/png",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".webp": "image/webp",
+                }
+                content_type = content_types[image_path.suffix.lower()]
+
+                response = await client.patch(
+                    f"/api/users/{user['id']}/picture",
+                    files={
+                        "file": (
+                            image_path.name,
+                            image_path.read_bytes(),
+                            content_type,
+                        ),
+                    },
+                    headers={"Authorization": f"Bearer {token}"},
+                )
+                response.raise_for_status()
+                print(f"    Uploaded: {image_path.name}")
 
             users.append(
                 {"id": user["id"], "username": user["username"], "token": token},
             )
 
-        print(f"\nCreating {len(POSTS) + 1} posts...")
+        print(f"\\nCreating {len(POSTS) + 1} posts...")
 
         # First create POST_44 (will become oldest after date update)
         response = await client.post(
@@ -368,15 +401,15 @@ async def populate() -> None:
                 else f"  Created: '{title}'",
             )
 
-        print("\nUpdating post dates...")
+        print("\\nUpdating post dates...")
         await update_post_dates()
 
     await engine.dispose()
 
-    print("\nDone!")
+    print("\\nDone!")
     print(f"  {len(USERS)} users")
     print(f"  {len(POSTS) + 1} posts")
-    print("  Profile pictures saved locally")
+    print(f"  {image_users_count} profile pictures uploaded")
 
 
 if __name__ == "__main__":
