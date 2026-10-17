@@ -13,3 +13,5 @@
 <!--6. To check migrations history   ==> uv run alembic history -->
 
 <!--7. to work on postgresql in the CLI ==> export PATH="$PATH:/c/Program Files/PostgreSQL/18/bin"-->
+
+<!--8. Boto3 is the official AWS SDK for Python maintained by Amazon Web Services that allows developers to create, configure, and manage AWS services using Python code -->
