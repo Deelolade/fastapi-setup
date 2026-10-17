@@ -1,5 +1,7 @@
 import asyncio
 import random
+import sys
+import selectors
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -412,5 +414,12 @@ async def populate() -> None:
     print(f"  {image_users_count} profile pictures uploaded")
 
 
-if __name__ == "__main__":
+if sys.platform == "win32":
+    asyncio.run(
+        populate(),
+        loop_factory=lambda: asyncio.SelectorEventLoop(
+            selectors.SelectSelector()
+        ),
+    )
+else:
     asyncio.run(populate())
