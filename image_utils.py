@@ -7,7 +7,7 @@ from starlette.concurrency import run_in_threadpool
 
 from config import settings
 
-# _ in front of the function makes it a private helper, should not be importeed into other files 
+# _ in front of the function makes it a private helper, should not be imported into other files 
 def _get_s3_client(): 
     return boto3.client(
         "s3",
@@ -53,8 +53,18 @@ def _upload_to_s3(file_bytes: bytes, key: str) -> None:
         ExtraArgs={"ContentType": "image/jpeg"},
     )
 
-
 def _delete_from_s3(key: str) -> None:
     s3 = _get_s3_client()
     s3.delete_object(Bucket=settings.s3_bucket_name, Key=key)
 
+async def upload_profile_image(file_bytes: bytes, filename: str) -> None:
+    key = f"profile_pics/{filename}"
+    await run_in_threadpool(_upload_to_s3, file_bytes, key)
+
+
+
+async def delete_profile_image(filename: str | None) -> None:
+    if filename is None:
+        return
+    key = f"profile_pics/{filename}"
+    await run_in_threadpool(_delete_from_s3, key)
