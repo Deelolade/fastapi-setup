@@ -3,7 +3,8 @@
 
 ### dotenv ###
 .env
-
+.env.*
+!.env.example
 ### Database Files ###
 *.sqlite3
 *.db
