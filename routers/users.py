@@ -23,7 +23,7 @@ from image_utils import delete_profile_image, process_profile_image, upload_prof
 
 from email_utils import send_password_reset_email
 
-from botocore.exception import ClientError
+from botocore.exceptions import ClientError
 
 router = APIRouter()
 
@@ -392,7 +392,7 @@ async def upload_profile_picture(
             detail="Invalid image file. Please upload a valid image (JPEG, PNG, GIF, WebP).",
         ) from err
 
-        
+
         # Upload to S3 (also runs in threadpool via async wrapper)
     try:
         await upload_profile_image(processed_bytes, new_filename)
