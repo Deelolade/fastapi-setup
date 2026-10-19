@@ -1,5 +1,12 @@
 import os
 from collections.abc import AsyncGenerator
+import asyncio
+import sys
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(
+        asyncio.WindowsSelectorEventLoopPolicy()
+    )
 
 os.environ["DATABASE_URL"] = (
     "postgresql+psycopg://bloguser:blogpass@localhost/test_blog"
@@ -59,8 +66,8 @@ async def setup_database(test_engine):
     await test_engine.dispose()
 
 
- @pytest.fixture
- async def db_session(
+@pytest.fixture
+async def db_session(
      test_engine,
      setup_database,
  ) -> AsyncGenerator[AsyncSession]:
